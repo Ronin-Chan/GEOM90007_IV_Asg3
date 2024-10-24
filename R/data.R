@@ -147,26 +147,22 @@ load_master_data_local <- function() {
 
   # On-street parking bays
   bays_sp <- load_geojson("./data/bays.geojson")
-  
-  # Convert to sf object
-  bays_sf <- st_as_sf(bays_sp)
-
-  # Calculate the centroids using sf
-  bay_centroids <- st_centroid(bays_sf)
-  
+  # Calculate the centroids from the spatial data
+  bay_centroids <- rgeos::gCentroid(bays_sp, byid = TRUE)
   # Extract the dataframe from the spatial dataframe
   # Assign the longitude, latitude from the calculated centroids
-  bays <- st_drop_geometry(bays_sf) %>% 
-    mutate(
-      longitude = st_coordinates(bay_centroids)[, 1],
-      latitude = st_coordinates(bay_centroids)[, 2]
-    )
+  bays <- bays_sp@data %>% mutate(
+    longitude = bay_centroids@coords[, 1],
+    latitude = bay_centroids@coords[, 2]
+  )
 
   # On-street car park bay restrictions
   disability <- load_json("./data/restrictions_disability_only.json") %>%
     # rename key bayid to bay_id for consistency
     rename(bay_id = bayid, disability_deviceid = deviceid) %>%
     select(c(bay_id, disability_deviceid))
+
+
 
   #' @section Paystay datasets -----------------------------------------------
 
@@ -187,6 +183,9 @@ load_master_data_local <- function() {
     left_join(disability, by = "bay_id") %>%
     left_join(paystay_segments, by = "rd_seg_id") %>%
     left_join(paystay_restrictions, by = "pay_stay_zone") 
+
+  #' @debug
+  # View(df)
 
   return(df)
 }
