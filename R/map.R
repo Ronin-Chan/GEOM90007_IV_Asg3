@@ -110,7 +110,7 @@ map_renderer <- function(map_data, state) {
     lat = state$filter_loc[1],
     lng = state$filter_loc[2],
     radius = unlist(state$radar_info[1]),
-    color = "#61D095",
+    color = "#ff0000",
     fillOpacity = unlist(state$radar_info[2]),
     weight = 0.2,
     stroke = TRUE
