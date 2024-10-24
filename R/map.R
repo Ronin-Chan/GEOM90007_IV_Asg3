@@ -67,12 +67,9 @@ map_renderer <- function(map_data, state) {
 
   # Mapbox template location
   mapbox_template <- paste0(
-    "https://api.mapbox.com/styles/v1/bringmerocks/",
-    "cl6sz4cs5002k14nx3w26n0jq",
-    "/tiles/{z}/{x}/{y}",
-    "?access_token=",
-    "pk.eyJ1IjoiYnJpbmdtZXJvY2tzIiwiYSI6ImNsNmo0dzdiMDNkMHYzanFzY3lkeHZvbGQifQ",
-    ".fEx-BQJvdzz_J4-XIWazbw"
+    "https://api.mapbox.com/styles/v1/expsuperdope/cm2jyrd2q008p01plhzqsek71/tiles/",
+    "{z}/{x}/{y}?access_token=",
+    "pk.eyJ1IjoiZXhwc3VwZXJkb3BlIiwiYSI6ImNtMmp5bGo5NTBhMGoycW92b2k4bjJ4N3EifQ.EkaXg8v7lN6iaJyJfxtptw"
   )
 
   map <- map_data %>%
