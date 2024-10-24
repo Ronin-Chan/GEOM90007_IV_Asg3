@@ -8,8 +8,7 @@ library(glue)
 library(tidyr)
 library(stringr)
 library(geojsonio)
-# library(rgeos)
-library(sf)
+library(rgeos)
 library(pracma)
 
 #' Load data from json
@@ -254,8 +253,8 @@ map_data <- function(master_data, state) {
     distinct(bay_id, .keep_all = TRUE)
 
   #' @debug
-  # View(filtered)
-
+  View(filtered)
+  print(filtered)
   return(filtered)
 }
 
