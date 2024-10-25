@@ -78,7 +78,7 @@ server <- function(input, output, session) {
     "darkgray" = "#949598",
     "foreground" = "#52525F",
     "accent" = "#3465E5",
-    "highlight" = "#61D095"
+    "highlight" = "#ff0000"
   )
 
   #' @param fonts {list} List of fonts used in the app.

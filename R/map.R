@@ -87,7 +87,7 @@ map_renderer <- function(map_data, state) {
     # Add Mapbox tile
     leaflet::addTiles(
       urlTemplate = mapbox_template,
-      #todo attribution =
+      # todo attribution =
       options = tileOptions(
         minZoom = 15,
         maxZoom = 20,
@@ -96,7 +96,7 @@ map_renderer <- function(map_data, state) {
     ) %>%
     # Add Marker Layer
     leaflet::addMarkers(
-      ~ longitude, ~ latitude,
+      ~longitude, ~latitude,
       icon = map_symbol("filled"),
       clusterOptions = leaflet::markerClusterOptions(
         disableClusteringAtZoom = 18,
@@ -107,19 +107,14 @@ map_renderer <- function(map_data, state) {
     ) %>%
     # Add Radar Layer
     leaflet::addCircles(
-    lat = state$filter_loc[1],
-    lng = state$filter_loc[2],
-    radius = unlist(state$radar_info[1]),
-    color = "#ff0000",
-    fillOpacity = unlist(state$radar_info[2]),
-    weight = 0.2,
-    stroke = TRUE
+      lat = state$filter_loc[1],
+      lng = state$filter_loc[2],
+      radius = unlist(state$radar_info[1]),
+      color = "#ff0000",
+      fillOpacity = unlist(state$radar_info[2]),
+      weight = 0.2,
+      stroke = TRUE
     ) %>%
-    #todo Add legend for custom symbols
-    # addControl(
-    #   position = "topright",
-    #   html = map_symbol_legend()
-    # ) %>%
     # Add Reference Scale
     leaflet::addScaleBar(
       position = "bottomleft",
@@ -130,9 +125,9 @@ map_renderer <- function(map_data, state) {
     ) %>%
     # North arrow
     leaflet::addControl(
-      html = htmltools::tags$img(width = 36, height = 36, src = "north.svg"),
+      html = htmltools::tags$div(style = "font-size: 32px;", "👆"),
       position = "bottomright",
-      className = "leaflet-control-north-arrow "
+      className = "leaflet-control-north-arrow"
     )
   return(map)
 }
