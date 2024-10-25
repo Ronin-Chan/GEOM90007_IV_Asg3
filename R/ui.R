@@ -30,23 +30,120 @@ headers <- tags$head(
   # javascript
   tags$script(
     src = "shiny_app.js"
+  ),
+  tags$script(
+    HTML(
+      "document.addEventListener('DOMContentLoaded', function() {
+         document.getElementById('button-search').addEventListener('click', function() {
+           var searchValue = document.getElementById('search-input').value;
+           if (searchValue) {
+             fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=au&q=${searchValue}&viewbox=144.93366,-37.79264,144.97670,-37.82391&bounded=1`, {
+               headers: {
+                 'User-Agent': 'MyApp/1.0 (your-email@example.com)'
+               }
+             })
+               .then(response => response.json())
+               .then(data => {
+               console.log(data)
+                 var resultsPanel = document.getElementById('search-results');
+                 resultsPanel.innerHTML = '';
+                 if (data.length > 0) {
+                   data.forEach(function(location) {
+                     var locationDiv = document.createElement('div');
+                     locationDiv.classList.add('result-wrapper');
+                     locationDiv.innerHTML = `<strong>${location.display_name}</strong>`;
+                     locationDiv.addEventListener('click', function() {
+                       Shiny.setInputValue('js_set_loc', { lat: location.lat, lon: location.lon });
+                     });
+                     resultsPanel.appendChild(locationDiv);
+                   });
+                 } else {
+                   resultsPanel.innerHTML = '<div class=\"result-none\">No results found, please try again.</div>';
+                 }
+               });
+           }
+         });
+         document.getElementById('button-gps').addEventListener('click', function() {
+           if (navigator.geolocation) {
+             navigator.geolocation.getCurrentPosition(function(position) {
+               var lat = position.coords.latitude;
+               var lon = position.coords.longitude;
+               console.log(lat)
+               Shiny.setInputValue('js_set_loc', {lat: lat, lon: lon});
+             });
+           }
+         });
+       });"
+    )
   )
 )
 
-# Filter Panel-----------------------------------------------------------------
-
-filter_panel <- tabPanel(
-  title = "Filters",
+search_panel <- tabPanel(
+  title = "Search",
   fluidRow(
-    class = "header",
-    tags$h1(
-      "Filters"
-    ),
-    tags$div(
-      id = "filters-show-hide",
-      class = "button-show",
+    class = "logo",
+    tags$img(
+      src = "logo.svg"
     )
   ),
+  fluidRow(
+    class = "search-bar",
+    tags$div(
+      class = "wrapper",
+      textInput(
+        inputId = "search-input",
+        label = "NGV",
+        placeholder = "Search Destination"
+      ),
+      tags$div(
+        id = "button-gps",
+        class = "button gps"
+      ),
+      tags$div(
+        id = "button-search",
+        class = "button search"
+      )
+    )
+  )
+)
+
+# Search Results Panel-------------------------------------------------------
+
+search_results_panel <- tabPanel(
+  id = "search-results",
+  title = "SearchResults"
+)
+
+
+
+# Filter Sidebar Panel---------------------------------------------------------
+
+filter_sidebar <- sidebarPanel(
+  titlePanel("Filters"),
+  fluidRow(
+    class = "search-bar",
+    tags$div(
+      class = "wrapper",
+      textInput(
+        inputId = "search-input",
+        label = "NGV",
+        placeholder = "Search Destination"
+      ),
+      actionButton(
+        inputId = "button-search",
+        label = "Search",
+        icon = icon("search"),
+        class = "button search"
+      ),
+      actionButton(
+        inputId = "button-gps",
+        label = "Use GPS",
+        icon = icon("location-arrow"),
+        class = "button gps"
+      )
+    )
+  ),
+  search_results_panel,
   tags$div(class = "spacer h32"),
   fluidRow(
     class = "control",
@@ -127,145 +224,28 @@ filter_panel <- tabPanel(
         class = "stepwise",
         label = "+"
       )
-    ),
-    # tags$div(
-    #   class = "label small",
-    #   "hours"
-    # ),
-  ),
-  tags$div(class = "spacer h32"),
-  # fluidRow(
-  #   class = "control v-collapse-bottom",
-  #   actionButton(
-  #     inputId = "search",
-  #     label = "Search"
-  #   )
-  # )
+    )
+  )
 )
 
-# Dimmer Panel-----------------------------------------------------------------
 
-dimmer_panel <- tabPanel(
-  title = "Dimmer"
-)
 
-# Map Panel---------------------------------------------------------------------
+# Main Panel-------------------------------------------------------------------
 
-map_panel <- tabPanel(
-  title = "Map",
+main_panel <- mainPanel(
   leafletOutput(
     "leaflet_map",
-    height = "100%", width = "100%"
-  )
-)
-
-# Search Panel-----------------------------------------------------------------
-
-search_panel <- tabPanel(
-  title = "Search",
-  fluidRow(
-    class = "logo",
-    tags$img(
-      src = "logo.svg"
-    )
-  ),
-  fluidRow(
-    class = "search-bar",
-    tags$div(
-      class = "wrapper",
-      textInput(
-        inputId = "search-input",
-        label = "NGV",
-        placeholder = "Search Destination"
-      ),
-      tags$div(
-        id = "button-gps",
-        class = "button gps"
-      ),
-      tags$div(
-        id = "button-search",
-        class = "button search"
-      )
-    )
-  )
-)
-
-search_results_panel <- tabPanel(
-  title = "SearchResults"
-)
-
-# Intro panel------------------------------------------------------------------
-
-intro_panel <- tabPanel(
-  title = "Intro",
-  class = "page-1",
-  tags$img(class = "logo", src = "./logo.svg"),
-  tags$div(
-    class = "pages",
-    tags$div(
-      class = "page",
-      tags$img(src = "./parking_area.svg"),
-      tags$p("Access parking spot availability in Melbourne in real-time.")
-    ),
-    tags$div(
-      class = "page",
-      tags$img(src = "./location.svg"),
-      tags$p(
-        "Find spots near your location, filter by how much you want to walk."
-      )
-    ),
-    tags$div(
-      class = "page",
-      tags$img(src = "./city.svg"),
-      tags$p(
-        "It just got easier to live in the most liveable city in the world."
-      )
-    )
-  ),
-  tags$div(class = "bubble one"),
-  tags$div(class = "bubble two"),
-  tags$div(
-    class = "dots",
-    tags$div(class = "dot seq-1"),
-    tags$div(class = "dot seq-2"),
-    tags$div(class = "dot seq-3")
-  ),
-  tags$div(
-    id = "intro-left",
-    class = "button left",
-    direction = "left"
-  ),
-  tags$div(
-    id = "intro-right",
-    class = "button right",
-    direction = "right"
-  ),
-)
-
-# Loading panel----------------------------------------------------------------
-
-loading_panel <- tabPanel(
-  title = "Loading",
-  class = "container",
-  tags$div(
-    class = "pulse"
+    height = "100vh",
+    width = "100%"
   )
 )
 
 # UI element-------------------------------------------------------------------
 
-ui <- navbarPage(
-  title = "Parking in Melbourne",
-  map_panel,
-  search_panel,
-  search_results_panel,
-  dimmer_panel,
-  loading_panel,
-  filter_panel,
-  intro_panel,
-  header = headers,
-  windowTitle = "Parking in Melbourne",
-  fluid = FALSE,
-  position = "fixed-top",
-  lang = "en"
+ui <- fluidPage(
+  headers,
+  sidebarLayout(
+    sidebarPanel = filter_sidebar,
+    mainPanel = main_panel
+  )
 )
