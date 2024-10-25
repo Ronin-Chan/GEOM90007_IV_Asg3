@@ -4,6 +4,7 @@
 library(shiny)
 library(glue)
 library(htmltools)
+library(shinyWidgets)
 
 # Headers----------------------------------------------------------------------
 
@@ -217,7 +218,7 @@ filter_sidebar <- sidebarPanel(
     tags$div(
       class = "label",
       style = "color: black; font-size: 1.2em;",
-      "Parking duration(hours)"
+      "Parking duration (hours)"
     ),
     fluidRow(
       class = "w-150",
@@ -259,6 +260,7 @@ main_panel <- mainPanel(
 # UI element-------------------------------------------------------------------
 
 ui <- fluidPage(
+  chooseSliderSkin("Flat", color = "#FFA500"),
   headers,
   # toggle_sidebar_button,
   sidebarLayout(
