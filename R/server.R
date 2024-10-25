@@ -77,8 +77,7 @@ server <- function(input, output, session) {
     "gray" = "#A8A8B5",
     "darkgray" = "#949598",
     "foreground" = "#52525F",
-    "accent" = "#3465E5",
-    "highlight" = "#ff0000"
+    "highlight" = "#FFA500"
   )
 
   #' @param fonts {list} List of fonts used in the app.
@@ -169,67 +168,75 @@ server <- function(input, output, session) {
 
   #' Function that displays information on user clicked
   #' marker
-  observeEvent(input$leaflet_map_marker_click, {
-    selected_marker <- state$filtered_data %>% filter(
-                       longitude == input$leaflet_map_marker_click$lng &
-                       latitude == input$leaflet_map_marker_click$lat
-                       ) %>%
-                       distinct(bay_id, .keep_all = TRUE)
+observeEvent(input$leaflet_map_marker_click, {
+  selected_marker <- state$filtered_data %>% filter(
+                     longitude == input$leaflet_map_marker_click$lng & 
+                     latitude == input$leaflet_map_marker_click$lat
+                   ) %>%
+                   distinct(bay_id, .keep_all = TRUE)
 
-    disability <- ifelse(!is.na(selected_marker$disability_deviceid),
-                         "",
-                         "hidden")
-    free <- ifelse(!is.na(selected_marker$cost_per_hour),
-                   "hidden",
-                   "")
-    meter_type <- get_meter_type(selected_marker$maximum_stay)
+  disability <- ifelse(!is.na(selected_marker$disability_deviceid), "", "hidden")
+  free <- ifelse(!is.na(selected_marker$cost_per_hour), "hidden", "")
+  meter_type <- get_meter_type(selected_marker$maximum_stay)
 
-    # Detail information
-    location <- selected_marker$street
-    cost <- sprintf("$%.2f", selected_marker$cost_per_hour/100)
-    start_time <- selected_marker$start_time
-    end_time <- selected_marker$end_time
+  # Detail information
+  location <- selected_marker$street
+  cost <- sprintf("$%.2f", selected_marker$cost_per_hour / 100)
+  start_time <- selected_marker$start_time
+  end_time <- selected_marker$end_time
 
-    is_restricted <- is.na(location) || is.na(cost) ||
-      is.na(start_time) || is.na(end_time)
+  is_restricted <- is.na(location) || is.na(cost) ||
+    is.na(start_time) || is.na(end_time)
 
-    # Display different information depending on whether it is available
-    if (is_restricted) {
-      details <- tags$div(
-        class = "bay-info-details",
-        tags$p("No restrictions apply to this bay.")
-      )
-    } else {
-      details <- tags$div(
-        class = "bay-info-details",
-        tags$p(tags$b("Location: "), location),
-        tags$p(tags$b("Cost Per Hour: "), cost),
-        tags$p(tags$b("Start Time: "), start_time),
-        tags$p(tags$b("End Time: "), end_time)
-      )
-    }
+  # Display different information depending on whether it is available
+  if (is_restricted) {
+    details <- tags$div(
+      class = "bay-info-details",
+      tags$p("No restrictions apply to this bay.")
+    )
+  } else {
+    details <- tags$div(
+      class = "bay-info-details",
+      tags$p(tags$b("Location: "), location),
+      tags$p(tags$b("Cost Per Hour: "), cost),
+      tags$p(tags$b("Start Time: "), start_time),
+      tags$p(tags$b("End Time: "), end_time)
+    )
+  }
 
-    # Displays popup information panel
-    shinyalert(
-      title = "Bay Information",
-      type = "info",
-      html = TRUE,
-      showConfirmButton = FALSE,
-      closeOnClickOutside = TRUE,
-      closeOnEsc = TRUE,
-      text = tags$div(
-        class = "bay-info-wrapper",
-        details,
-        tags$div(
-          class = "bay-info-icons",
-          tags$img(class = "meter_type", src = meter_type),
-          tags$img(class = glue("disability {disability}"),
-                   src = "./disabled.svg"),
-          tags$img(class = glue("free {free}"), src = "./free.svg")
+  # Displays popup information panel with styled icons
+  shinyalert(
+    title = "Bay Information",
+    # type = "info",
+    html = TRUE,
+    showConfirmButton = FALSE,
+    closeOnClickOutside = TRUE,
+    closeOnEsc = TRUE,
+    text = tags$div(
+      class = "bay-info-wrapper",
+      details,
+      tags$div(
+        class = "bay-info-icons",
+        tags$img(
+          class = "meter_type",
+          src = meter_type,
+          style = "width: 70px; height: 70px;" 
+        ),
+        tags$img(
+          class = glue("disability {disability}"),
+          src = "./disabled.svg",
+          style = "width: 50px; height: 50px;"
+        ),
+        tags$img(
+          class = glue("free {free}"),
+          src = "./free.svg",
+          style = "width: 50px; height: 50px;"
         )
       )
     )
-  })
+  )
+})
+
 
   #' Calculates the number of hours that a car can be parked for
   #' @param maximum_stay_mins max time allowed to park in minutes

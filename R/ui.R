@@ -9,82 +9,94 @@ library(htmltools)
 
 headers <- tags$head(
   # favicon
-  tags$link(
-    rel = "icon", type = "image/x-icon",
-    href = "favicon.svg"
-  ),
+  tags$link(rel = "icon", type = "image/x-icon", href = "favicon.svg"),
+  tags$style(HTML("
+  .leaflet-interactive {
+    stroke: #FFA500 !important;       /* Outline color for polygons (orange) */
+    stroke-width: 1px !important;     /* Thinner outline */
+    fill: #FFA500 !important;         /* Fill color for polygons (orange) */
+    fill-opacity: 0.1 !important;     /* Adjust fill opacity for better visibility */
+  }
+")),
   # web fonts
-  tags$link(
-    rel = "stylesheet", type = "text/css",
-    href = "https://use.typekit.net/zvh8ynu.css"
-  ),
-  tags$link(
-    rel = "stylesheet", type = "text/css",
-    href = "https://fonts.googleapis.com/icon?family=Material+Icons"
-  ),
-  # css overrides
-  tags$link(
-    rel = "stylesheet", type = "text/css",
-    href = "shiny_app.css"
-  ),
-  # javascript
+  tags$link(rel = "stylesheet", type = "text/css", href = "https://use.typekit.net/zvh8ynu.css"),
+  tags$link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/icon?family=Material+Icons"),
+  tags$style(HTML("
+    /* Overlay styling for search results */
+    #search-results {
+      position: absolute;
+      top: 150px; /* Adjust this to be below the search bar */
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background-color: white;
+      border: 1px solid #ddd;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: none; /* Hidden by default */
+    }
+    .result-wrapper {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+    .result-wrapper:hover {
+      background-color: #f1f1f1;
+    }
+    .result-none {
+      padding: 10px;
+      color: #888;
+    }
+  ")),
+  # JavaScript for search and GPS functionality
   tags$script(
-    src = "shiny_app.js"
-  ),
-  tags$script(
-    HTML(
-      "document.addEventListener('DOMContentLoaded', function() {
-         document.getElementById('button-search').addEventListener('click', function() {
-           var searchValue = document.getElementById('search-input').value;
-           if (searchValue) {
-             fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=au&q=${searchValue}&viewbox=144.93366,-37.79264,144.97670,-37.82391&bounded=1`, {
-               headers: {
-                 'User-Agent': 'MyApp/1.0 (your-email@example.com)'
-               }
-             })
-               .then(response => response.json())
-               .then(data => {
-               console.log(data)
-                 var resultsPanel = document.getElementById('search-results');
-                 resultsPanel.innerHTML = '';
-                 if (data.length > 0) {
-                   data.forEach(function(location) {
-                     var locationDiv = document.createElement('div');
-                     locationDiv.classList.add('result-wrapper');
-                     locationDiv.innerHTML = `<strong>${location.display_name}</strong>`;
-                     locationDiv.addEventListener('click', function() {
-                       Shiny.setInputValue('js_set_loc', { lat: location.lat, lon: location.lon });
-                     });
-                     resultsPanel.appendChild(locationDiv);
-                   });
-                 } else {
-                   resultsPanel.innerHTML = '<div class=\"result-none\">No results found, please try again.</div>';
-                 }
-               });
-           }
-         });
-         document.getElementById('button-gps').addEventListener('click', function() {
-           if (navigator.geolocation) {
-             navigator.geolocation.getCurrentPosition(function(position) {
-               var lat = position.coords.latitude;
-               var lon = position.coords.longitude;
-               Shiny.setInputValue('js_set_loc', {lat: lat, lon: lon});
-             });
-           }
-         });
-         document.getElementById('toggle-sidebar').addEventListener('click', function() {
-           var sidebar = document.querySelector('.sidebar');
-           var mainPanel = document.querySelector('.main-panel');
-           if (sidebar.style.display === 'none' || sidebar.style.display === '') {
-             sidebar.style.display = 'block';
-             mainPanel.style.width = '75%';
-           } else {
-             sidebar.style.display = 'none';
-             mainPanel.style.width = '100%';
-           }
-         });
-       });"
-    )
+    HTML("
+      document.addEventListener('DOMContentLoaded', function() {
+        // Search button click listener
+        document.getElementById('button-search').addEventListener('click', function() {
+          var searchValue = document.getElementById('search-input').value;
+          if (searchValue) {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=au&q=${searchValue}&viewbox=144.93366,-37.79264,144.97670,-37.82391&bounded=1`, {
+              headers: {
+                'User-Agent': 'MyApp/1.0 (your-email@example.com)'
+              }
+            })
+              .then(response => response.json())
+              .then(data => {
+                var resultsPanel = document.getElementById('search-results');
+                resultsPanel.innerHTML = '';
+                resultsPanel.style.display = 'block'; // Show the results panel
+                if (data.length > 0) {
+                  data.forEach(function(location) {
+                    var locationDiv = document.createElement('div');
+                    locationDiv.classList.add('result-wrapper');
+                    locationDiv.innerHTML = `<strong>${location.display_name}</strong>`;
+                    locationDiv.addEventListener('click', function() {
+                      Shiny.setInputValue('js_set_loc', { lat: location.lat, lon: location.lon });
+                      resultsPanel.style.display = 'none'; // Hide the panel after selection
+                    });
+                    resultsPanel.appendChild(locationDiv);
+                  });
+                } else {
+                  resultsPanel.innerHTML = '<div class=\"result-none\">No results found, please try again.</div>';
+                }
+              });
+          }
+        });
+
+        // GPS button click listener
+        document.getElementById('button-gps').addEventListener('click', function() {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+              var lat = position.coords.latitude;
+              var lon = position.coords.longitude;
+              Shiny.setInputValue('js_set_loc', {lat: lat, lon: lon});
+            });
+          }
+        });
+      });
+    ")
   )
 )
 
@@ -121,7 +133,7 @@ search_panel <- fluidRow(
 
 search_results_panel <- tags$div(
   id = "search-results",
-  class = "search-results"
+  class = "search-results-panel"
 )
 
 # Filter Sidebar Panel---------------------------------------------------------
