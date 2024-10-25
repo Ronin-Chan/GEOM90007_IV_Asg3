@@ -10,6 +10,14 @@ library(htmltools)
 headers <- tags$head(
   # favicon
   tags$link(rel = "icon", type = "image/x-icon", href = "favicon.svg"),
+  tags$style(HTML("
+  .leaflet-interactive {
+    stroke: #FFA500 !important;       /* Outline color for polygons (orange) */
+    stroke-width: 1px !important;     /* Thinner outline */
+    fill: #FFA500 !important;         /* Fill color for polygons (orange) */
+    fill-opacity: 0.1 !important;     /* Adjust fill opacity for better visibility */
+  }
+")),
   # web fonts
   tags$link(rel = "stylesheet", type = "text/css", href = "https://use.typekit.net/zvh8ynu.css"),
   tags$link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/icon?family=Material+Icons"),
@@ -76,7 +84,7 @@ headers <- tags$head(
               });
           }
         });
-        
+
         // GPS button click listener
         document.getElementById('button-gps').addEventListener('click', function() {
           if (navigator.geolocation) {
@@ -126,7 +134,7 @@ search_panel <- tabPanel(
 
 search_results_panel <- tags$div(
   id = "search-results",
-  class = "search-results-panel"  # Overlay panel for search results
+  class = "search-results-panel" # Overlay panel for search results
 )
 
 # Filter Sidebar Panel---------------------------------------------------------
@@ -260,4 +268,3 @@ ui <- fluidPage(
     mainPanel = main_panel
   )
 )
-
