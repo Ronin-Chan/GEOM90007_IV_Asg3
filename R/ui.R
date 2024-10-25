@@ -255,7 +255,7 @@ loading_panel <- tabPanel(
 # UI element-------------------------------------------------------------------
 
 ui <- navbarPage(
-  title = "ParkIt",
+  title = "Parking in Melbourne",
   map_panel,
   search_panel,
   search_results_panel,
@@ -264,7 +264,7 @@ ui <- navbarPage(
   filter_panel,
   intro_panel,
   header = headers,
-  windowTitle = "ParkIt",
+  windowTitle = "Parking in Melbourne",
   fluid = FALSE,
   position = "fixed-top",
   lang = "en"
