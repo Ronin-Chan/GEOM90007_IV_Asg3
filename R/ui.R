@@ -13,8 +13,6 @@ headers <- tags$head(
   # web fonts
   tags$link(rel = "stylesheet", type = "text/css", href = "https://use.typekit.net/zvh8ynu.css"),
   tags$link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/icon?family=Material+Icons"),
-  # CSS overrides
-  tags$link(rel = "stylesheet", type = "text/css", href = "shiny_app.css"),
   tags$style(HTML("
     /* Overlay styling for search results */
     #search-results {
