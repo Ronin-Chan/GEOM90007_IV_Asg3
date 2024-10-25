@@ -1,56 +1,63 @@
-################################################################################
-# UI components for the dashboard                                              #
-################################################################################
-library(shiny)
-library(glue)
-library(htmltools)
-library(shinyWidgets)
+# UI components for the dashboard                                              
 
-# Headers----------------------------------------------------------------------
+# Import necessary libraries for UI components
+library(shiny)          # For building the Shiny app interface
+library(glue)           # For string interpolation in UI components
+library(htmltools)      # For working with HTML within Shiny
+library(shinyWidgets)   # For additional UI widgets and customization
+
+# Headers
+# Define the headers that include external styles, scripts, and favicons
 
 headers <- tags$head(
-  # favicon
+  # Add favicon (icon displayed in browser tab)
   tags$link(rel = "icon", type = "image/x-icon", href = "favicon.svg"),
+  
+  # Custom CSS for leaflet map styling and interactive elements
   tags$style(HTML("
   .leaflet-interactive {
     stroke: #FFA500 !important;       /* Outline color for polygons (orange) */
-    stroke-width: 1px !important;     /* Thinner outline */
+    stroke-width: 1px !important;     /* Thinner outline for improved aesthetics */
     fill: #FFA500 !important;         /* Fill color for polygons (orange) */
     fill-opacity: 0.1 !important;     /* Adjust fill opacity for better visibility */
   }
 ")),
-  # web fonts
+
+  # Import custom web fonts for text styling in the app
   tags$link(rel = "stylesheet", type = "text/css", href = "https://use.typekit.net/zvh8ynu.css"),
   tags$link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/icon?family=Material+Icons"),
+
+  # Custom styles for the search results panel
   tags$style(HTML("
-    /* Overlay styling for search results */
+    /* Styling for the search results dropdown */
     #search-results {
       position: absolute;
-      top: 150px; /* Adjust this to be below the search bar */
+      top: 150px; /* Place below the search bar */
       left: 0;
       right: 0;
       z-index: 1000;
       background-color: white;
       border: 1px solid #ddd;
       max-height: 300px;
-      overflow-y: auto;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow-y: auto; /* Allow vertical scrolling for long results */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
       display: none; /* Hidden by default */
     }
     .result-wrapper {
       padding: 10px;
       border-bottom: 1px solid #eee;
-      cursor: pointer;
+      cursor: pointer; /* Highlightable results */
     }
     .result-wrapper:hover {
-      background-color: #f1f1f1;
+      background-color: #f1f1f1; /* Highlight on hover */
     }
     .result-none {
       padding: 10px;
-      color: #888;
+      color: #888; /* Styling for no-results message */
     }
   ")),
-  # JavaScript for search and GPS functionality
+
+  # JavaScript for handling search functionality and GPS location fetching
   tags$script(
     HTML("
       document.addEventListener('DOMContentLoaded', function() {
@@ -58,6 +65,7 @@ headers <- tags$head(
         document.getElementById('button-search').addEventListener('click', function() {
           var searchValue = document.getElementById('search-input').value;
           if (searchValue) {
+            // Fetch search results from OpenStreetMap's Nominatim API
             fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=au&q=${searchValue}&viewbox=144.93366,-37.79264,144.97670,-37.82391&bounded=1`, {
               headers: {
                 'User-Agent': 'MyApp/1.0 (your-email@example.com)'
@@ -67,7 +75,7 @@ headers <- tags$head(
               .then(data => {
                 var resultsPanel = document.getElementById('search-results');
                 resultsPanel.innerHTML = '';
-                resultsPanel.style.display = 'block'; // Show the results panel
+                resultsPanel.style.display = 'block'; // Display search results panel
                 if (data.length > 0) {
                   data.forEach(function(location) {
                     var locationDiv = document.createElement('div');
@@ -75,7 +83,7 @@ headers <- tags$head(
                     locationDiv.innerHTML = `<strong>${location.display_name}</strong>`;
                     locationDiv.addEventListener('click', function() {
                       Shiny.setInputValue('js_set_loc', { lat: location.lat, lon: location.lon });
-                      resultsPanel.style.display = 'none'; // Hide the panel after selection
+                      resultsPanel.style.display = 'none'; // Hide panel after selection
                     });
                     resultsPanel.appendChild(locationDiv);
                   });
@@ -101,7 +109,8 @@ headers <- tags$head(
   )
 )
 
-# Search Panel------------------------------------------------------------------
+# Search Panel
+# Defines the search panel for the app where users can input search terms or use GPS
 
 search_panel <- fluidRow(
   class = "search-bar",
@@ -111,48 +120,51 @@ search_panel <- fluidRow(
       class = "label", style = "color: black; font-size: 1.2em;", "Search"
     ),
     textInput(
-      inputId = "search-input",
+      inputId = "search-input",            # Input for typing search terms
       label = NULL,
-      placeholder = "Search Destination"
+      placeholder = "Search Destination"   # Placeholder text for the input
     ),
     actionButton(
-      inputId = "button-search",
+      inputId = "button-search",           # Search button
       label = "Search",
       icon = icon("search"),
-      class = "button search"
+      class = "button search"              # CSS class for styling the button
     ),
     actionButton(
-      inputId = "button-gps",
+      inputId = "button-gps",              # GPS button for fetching current location
       label = "Use GPS",
       icon = icon("location-arrow"),
-      class = "button gps"
+      class = "button gps"                 # CSS class for styling the button
     )
   )
 )
 
-# Search Results Panel-------------------------------------------------------
+# Search Results Panel
+# A panel to display search results dynamically from the user's query
 
 search_results_panel <- tags$div(
-  id = "search-results",
-  class = "search-results-panel"
+  id = "search-results",                 # Panel for search results
+  class = "search-results-panel"         # CSS class for styling the panel
 )
 
-# Filter Sidebar Panel---------------------------------------------------------
+# Filter Sidebar Panel
+# Sidebar panel that contains various filter options for users to adjust
 
 toggle_sidebar_button <- actionButton(
-  inputId = "toggle-sidebar",
+  inputId = "toggle-sidebar",            # Button to toggle the visibility of the sidebar
   label = "Toggle Filters",
   icon = icon("filter"),
   class = "toggle-sidebar"
 )
 
 filter_sidebar <- sidebarPanel(
-  class = "sidebar",
-  # titlePanel("Filters"),
-  # toggle_sidebar_button,
-  search_panel,
-  search_results_panel,
-  tags$div(class = "spacer h32"),
+  class = "sidebar",                     # CSS class for sidebar styling
+  # toggle_sidebar_button,               # Optional button to toggle the sidebar visibility
+  search_panel,                          # Embed the search panel in the sidebar
+  search_results_panel,                  # Embed the search results panel
+  tags$div(class = "spacer h32"),        # Spacer for layout spacing (32px height)
+
+  # Checkbox to filter only free parking spots
   fluidRow(
     class = "control",
     checkboxInput(
@@ -161,6 +173,8 @@ filter_sidebar <- sidebarPanel(
       value = FALSE
     )
   ),
+  
+  # Checkbox to filter only disability-accessible parking spots
   fluidRow(
     class = "control",
     checkboxInput(
@@ -169,7 +183,10 @@ filter_sidebar <- sidebarPanel(
       value = FALSE
     )
   ),
-  tags$div(class = "spacer h32"),
+
+  tags$div(class = "spacer h32"),        # Spacer for layout spacing (32px height)
+
+  # Slider for adjusting the radius filter (0 to 1 km)
   fluidRow(
     class = "control",
     tags$div(
@@ -178,17 +195,20 @@ filter_sidebar <- sidebarPanel(
       "Radius"
     ),
     sliderInput(
-      inputId = "filter_radius",
+      inputId = "filter_radius",         # Slider for adjusting the search radius
       min = 0,
       max = 1,
       step = 0.25,
-      value = c(0, 1),
+      value = c(0, 1),                  # Default range is 0 to 1 km
       dragRange = TRUE,
       label = NULL,
-      post = "km"
+      post = "km"                       # Add "km" unit to the slider values
     )
   ),
-  tags$div(class = "spacer h32"),
+
+  tags$div(class = "spacer h32"),        # Spacer for layout spacing (32px height)
+
+  # Numeric input for minimum and maximum cost per hour
   fluidRow(
     class = "control input-small cost",
     tags$div(
@@ -199,20 +219,23 @@ filter_sidebar <- sidebarPanel(
     fluidRow(
       style = "display: flex; gap: 5px; align-items: flex-start; margin-left: 0px;",
       numericInput(
-        inputId = "filter_cost_min",
+        inputId = "filter_cost_min",     # Minimum cost input
         label = "min",
         value = 0,
         width = "80px"
       ),
       numericInput(
-        inputId = "filter_cost_max",
+        inputId = "filter_cost_max",     # Maximum cost input
         label = "max",
         value = 6,
         width = "80px"
       )
     )
   ),
-  tags$div(class = "spacer h32"),
+
+  tags$div(class = "spacer h32"),        # Spacer for layout spacing (32px height)
+
+  # Numeric input for adjusting parking duration with increment and decrement buttons
   fluidRow(
     class = "control input-small hide-label",
     tags$div(
@@ -224,21 +247,21 @@ filter_sidebar <- sidebarPanel(
       class = "w-150",
       style = "display: flex; gap: 5px; align-items: flex-start; margin-left: 0px;",
       actionButton(
-        inputId = "filter_duration_dec",
+        inputId = "filter_duration_dec", # Button to decrement parking duration
         class = "stepwise",
         label = "-"
       ),
       div(
         style = "padding-top: 0px;",
         numericInput(
-          inputId = "filter_duration",
+          inputId = "filter_duration",   # Input for parking duration in hours
           label = NULL,
           value = 2,
           width = "60px"
         )
       ),
       actionButton(
-        inputId = "filter_duration_inc",
+        inputId = "filter_duration_inc", # Button to increment parking duration
         class = "stepwise",
         label = "+"
       )
@@ -246,25 +269,26 @@ filter_sidebar <- sidebarPanel(
   )
 )
 
-# Main Panel-------------------------------------------------------------------
+# Main Panel
+# Defines the main panel of the app where the map is displayed
 
 main_panel <- mainPanel(
-  class = "main-panel",
-  leafletOutput(
+  class = "main-panel",                 # CSS class for the main panel
+  leafletOutput(                        # Output area for rendering the Leaflet map
     "leaflet_map",
-    height = "100vh",
-    width = "100%"
+    height = "100vh",                   # Full height for the map
+    width = "100%"                      # Full width for the map
   )
 )
 
-# UI element-------------------------------------------------------------------
+# UI Layout
+# Defines the layout of the UI with the sidebar and main panel
 
 ui <- fluidPage(
-  chooseSliderSkin("Flat", color = "#FFA500"),
-  headers,
-  # toggle_sidebar_button,
-  sidebarLayout(
-    sidebarPanel = filter_sidebar,
-    mainPanel = main_panel
+  chooseSliderSkin("Flat", color = "#FFA500"),  # Custom slider skin for consistency with theme
+  headers,                                     # Include the headers defined earlier
+  sidebarLayout(                               # Layout with sidebar and main panel
+    sidebarPanel = filter_sidebar,             # Sidebar panel for search and filters
+    mainPanel = main_panel                     # Main panel for displaying the map
   )
 )
