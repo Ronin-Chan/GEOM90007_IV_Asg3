@@ -120,21 +120,21 @@ search_panel <- fluidRow(
       class = "label", style = "color: black; font-size: 1.2em;", "Search"
     ),
     textInput(
-      inputId = "search-input",            # Input for typing search terms
+      inputId = "search-input",
       label = NULL,
-      placeholder = "Search Destination"   # Placeholder text for the input
+      placeholder = "Search Destination"
     ),
     actionButton(
-      inputId = "button-search",           # Search button
+      inputId = "button-search",
       label = "Search",
       icon = icon("search"),
-      class = "button search"              # CSS class for styling the button
+      class = "button search"
     ),
     actionButton(
-      inputId = "button-gps",              # GPS button for fetching current location
+      inputId = "button-gps",
       label = "Use GPS",
       icon = icon("location-arrow"),
-      class = "button gps"                 # CSS class for styling the button
+      class = "button gps"
     )
   )
 )
@@ -206,7 +206,7 @@ filter_sidebar <- sidebarPanel(
     )
   ),
 
-  tags$div(class = "spacer h32"),        # Spacer for layout spacing (32px height)
+  tags$div(class = "spacer h32"),
 
   # Numeric input for minimum and maximum cost per hour
   fluidRow(
@@ -233,7 +233,7 @@ filter_sidebar <- sidebarPanel(
     )
   ),
 
-  tags$div(class = "spacer h32"),        # Spacer for layout spacing (32px height)
+  tags$div(class = "spacer h32"),
 
   # Numeric input for adjusting parking duration with increment and decrement buttons
   fluidRow(
@@ -285,10 +285,10 @@ main_panel <- mainPanel(
 # Defines the layout of the UI with the sidebar and main panel
 
 ui <- fluidPage(
-  chooseSliderSkin("Flat", color = "#FFA500"),  # Custom slider skin for consistency with theme
-  headers,                                     # Include the headers defined earlier
-  sidebarLayout(                               # Layout with sidebar and main panel
-    sidebarPanel = filter_sidebar,             # Sidebar panel for search and filters
-    mainPanel = main_panel                     # Main panel for displaying the map
+  chooseSliderSkin("Flat", color = "#FFA500"),
+  headers,
+  sidebarLayout(
+    sidebarPanel = filter_sidebar,
+    mainPanel = main_panel
   )
 )

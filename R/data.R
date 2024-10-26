@@ -3,7 +3,7 @@
 # Loading the required libraries for working with JSON, data manipulation, 
 # API requests, spatial data processing, and mathematical operations.
 library(jsonlite)    # To read and parse JSON files
-library(dplyr)       # For data manipulation tasks (filtering, joining, selecting)
+library(dplyr)       # For data manipulation tasks
 library(RSocrata)    # To access data from the Socrata API
 library(glue)        # For string interpolation and formatting
 library(tidyr)       # For data reshaping and tidying
@@ -81,19 +81,12 @@ load_remote <- function(dataset, params = list()) {
   # Map the dataset name to the corresponding API resource identifier
   resource <- switch(
     dataset,
-    #' @see https://dev.socrata.com/foundry/data.melbourne.vic.gov.au/wuf8-susg
     "bays" = "wuf8-susg.json",           # On-street parking bay data
-    #' @see https://dev.socrata.com/foundry/data.melbourne.vic.gov.au/vdsi-4gtj
     "meters" = "vdsi-4gtj.json",         # Parking meter data
-    #' @see https://dev.socrata.com/foundry/data.melbourne.vic.gov.au/ntht-5rk7
     "restrictions" = "ntht-5rk7.json",   # Parking restrictions data
-    #' @see https://dev.socrata.com/foundry/data.melbourne.vic.gov.au/vh2v-4nfs
     "sensors" = "vh2v-4nfs.json",        # Real-time parking sensor data
-    #' @see https://dev.socrata.com/foundry/data.melbourne.vic.gov.au/7pgd-bdf2
     "sensors_2019" = "7pgd-bdf2.json",   # Historical sensor data from 2019
-    #' @see https://dev.socrata.com/foundry/data.melbourne.vic.gov.au/7q9g-yyvg
     "paystay_restrictions" = "7q9g-yyvg.json",  # PayStay parking restrictions
-    #' @see https://data.melbourne.vic.gov.au/Transport/Pay-Stay-parking-restrictions/ambt-72qg
     "paystay_segments" = "7q9g-yyvg.json",  # PayStay zone data
     TRUE: stop(glue("Unrecognised dataset {dataset}"))  # Throw error if dataset is not recognized
   )

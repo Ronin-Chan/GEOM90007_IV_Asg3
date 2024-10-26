@@ -66,7 +66,6 @@ server <- function(input, output, session) {
     updateNumericInput(inputId = "filter_duration", value = input$filter_duration - 1)
   })
 
-  #' State -------------------------------------------------------------------
   # This section defines the reactive state that holds the application's current
   # configuration, filters, and user inputs.
 

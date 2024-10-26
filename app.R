@@ -1,13 +1,11 @@
-# App dependencies-------------------------------------------------------------
-# Please run the following to ensure dependencies are installed
+# App dependencies
 source("./R/libraries.R")
 
-# Data-------------------------------------------------------------------------
+# Data
 source("./R/data.R")
 
-# Mapping----------------------------------------------------------------------
+# Mapping
 source("./R/map.R")
-
 
 # Define the Shiny app
 shiny::shinyApp(ui, server)

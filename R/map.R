@@ -148,17 +148,17 @@ map_renderer <- function(map_data, state) {
     ) %>%
     # Add a scale bar to the bottom left of the map for reference
     leaflet::addScaleBar(
-      position = "bottomleft",                # Position of the scale bar
+      position = "bottomleft",
       options = scaleBarOptions(
-        metric = TRUE,                        # Use metric units (e.g., meters)
-        imperial = FALSE                      # Do not use imperial units
+        metric = TRUE,
+        imperial = FALSE
       )
     ) %>%
     # Add a simple north arrow to indicate direction on the map
     leaflet::addControl(
-      html = htmltools::tags$div(style = "font-size: 32px;", "👆"), # North arrow icon
-      position = "bottomright",              # Position of the north arrow
-      className = "leaflet-control-north-arrow"  # Custom class for the north arrow control
+      html = htmltools::tags$div(style = "font-size: 32px;", "👆"),
+      position = "bottomright",
+      className = "leaflet-control-north-arrow"
     )
   
   # Return the generated map object for rendering
