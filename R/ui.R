@@ -1,10 +1,10 @@
-# UI components for the dashboard                                              
+# UI components for the dashboard
 
 # Import necessary libraries for UI components
-library(shiny)          # For building the Shiny app interface
-library(glue)           # For string interpolation in UI components
-library(htmltools)      # For working with HTML within Shiny
-library(shinyWidgets)   # For additional UI widgets and customization
+library(shiny) # For building the Shiny app interface
+library(glue) # For string interpolation in UI components
+library(htmltools) # For working with HTML within Shiny
+library(shinyWidgets) # For additional UI widgets and customization
 
 # Headers
 # Define the headers that include external styles, scripts, and favicons
@@ -12,7 +12,7 @@ library(shinyWidgets)   # For additional UI widgets and customization
 headers <- tags$head(
   # Add favicon (icon displayed in browser tab)
   tags$link(rel = "icon", type = "image/x-icon", href = "favicon.svg"),
-  
+
   # Custom CSS for leaflet map styling and interactive elements
   tags$style(HTML("
   .leaflet-interactive {
@@ -143,26 +143,26 @@ search_panel <- fluidRow(
 # A panel to display search results dynamically from the user's query
 
 search_results_panel <- tags$div(
-  id = "search-results",                 # Panel for search results
-  class = "search-results-panel"         # CSS class for styling the panel
+  id = "search-results", # Panel for search results
+  class = "search-results-panel" # CSS class for styling the panel
 )
 
 # Filter Sidebar Panel
 # Sidebar panel that contains various filter options for users to adjust
 
 toggle_sidebar_button <- actionButton(
-  inputId = "toggle-sidebar",            # Button to toggle the visibility of the sidebar
+  inputId = "toggle-sidebar", # Button to toggle the visibility of the sidebar
   label = "Toggle Filters",
   icon = icon("filter"),
   class = "toggle-sidebar"
 )
 
 filter_sidebar <- sidebarPanel(
-  class = "sidebar",                     # CSS class for sidebar styling
+  class = "sidebar", # CSS class for sidebar styling
   # toggle_sidebar_button,               # Optional button to toggle the sidebar visibility
-  search_panel,                          # Embed the search panel in the sidebar
-  search_results_panel,                  # Embed the search results panel
-  tags$div(class = "spacer h32"),        # Spacer for layout spacing (32px height)
+  search_panel, # Embed the search panel in the sidebar
+  search_results_panel, # Embed the search results panel
+  tags$div(class = "spacer h32"), # Spacer for layout spacing (32px height)
 
   # Checkbox to filter only free parking spots
   fluidRow(
@@ -173,7 +173,7 @@ filter_sidebar <- sidebarPanel(
       value = FALSE
     )
   ),
-  
+
   # Checkbox to filter only disability-accessible parking spots
   fluidRow(
     class = "control",
@@ -183,8 +183,7 @@ filter_sidebar <- sidebarPanel(
       value = FALSE
     )
   ),
-
-  tags$div(class = "spacer h32"),        # Spacer for layout spacing (32px height)
+  tags$div(class = "spacer h32"), # Spacer for layout spacing (32px height)
 
   # Slider for adjusting the radius filter (0 to 1 km)
   fluidRow(
@@ -195,17 +194,16 @@ filter_sidebar <- sidebarPanel(
       "Radius"
     ),
     sliderInput(
-      inputId = "filter_radius",         # Slider for adjusting the search radius
+      inputId = "filter_radius", # Slider for adjusting the search radius
       min = 0,
       max = 1,
       step = 0.25,
-      value = c(0, 1),                  # Default range is 0 to 1 km
+      value = c(0, 1), # Default range is 0 to 1 km
       dragRange = TRUE,
       label = NULL,
-      post = "km"                       # Add "km" unit to the slider values
+      post = "km" # Add "km" unit to the slider values
     )
   ),
-
   tags$div(class = "spacer h32"),
 
   # Numeric input for minimum and maximum cost per hour
@@ -219,20 +217,19 @@ filter_sidebar <- sidebarPanel(
     fluidRow(
       style = "display: flex; gap: 5px; align-items: flex-start; margin-left: 0px;",
       numericInput(
-        inputId = "filter_cost_min",     # Minimum cost input
+        inputId = "filter_cost_min", # Minimum cost input
         label = "min",
         value = 0,
         width = "80px"
       ),
       numericInput(
-        inputId = "filter_cost_max",     # Maximum cost input
+        inputId = "filter_cost_max", # Maximum cost input
         label = "max",
         value = 6,
         width = "80px"
       )
     )
   ),
-
   tags$div(class = "spacer h32"),
 
   # Numeric input for adjusting parking duration with increment and decrement buttons
@@ -254,7 +251,7 @@ filter_sidebar <- sidebarPanel(
       div(
         style = "padding-top: 0px;",
         numericInput(
-          inputId = "filter_duration",   # Input for parking duration in hours
+          inputId = "filter_duration", # Input for parking duration in hours
           label = NULL,
           value = 2,
           width = "60px"
@@ -273,11 +270,11 @@ filter_sidebar <- sidebarPanel(
 # Defines the main panel of the app where the map is displayed
 
 main_panel <- mainPanel(
-  class = "main-panel",                 # CSS class for the main panel
-  leafletOutput(                        # Output area for rendering the Leaflet map
+  class = "main-panel", # CSS class for the main panel
+  leafletOutput( # Output area for rendering the Leaflet map
     "leaflet_map",
-    height = "100vh",                   # Full height for the map
-    width = "100%"                      # Full width for the map
+    height = "100vh", # Full height for the map
+    width = "100%" # Full width for the map
   )
 )
 
@@ -287,8 +284,16 @@ main_panel <- mainPanel(
 ui <- fluidPage(
   chooseSliderSkin("Flat", color = "#FFA500"),
   headers,
-  sidebarLayout(
-    sidebarPanel = filter_sidebar,
-    mainPanel = main_panel
+  tags$style(HTML("
+    .custom-sidebar-layout {
+      margin-top: 5px;
+    }
+  ")),
+  div(
+    class = "custom-sidebar-layout",
+    sidebarLayout(
+      sidebarPanel = filter_sidebar,
+      mainPanel = main_panel
+    )
   )
 )
